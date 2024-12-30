@@ -1,0 +1,52 @@
+{
+	"schemaVersion": 1,
+	"id": "rimor",
+	"version": "${version}",
+	"name": "rimor",
+	"description": "A tycoon mod.",
+	"authors": [
+		"Kimit"
+	],
+	"contact": {
+		"homepage": "https://fabricmc.net/",
+		"sources": "https://github.com/FabricMC/fabric-example-mod"
+	},
+	"license": "CC0-1.0",
+	"icon": "assets/rimor/icon.png",
+	"environment": "*",
+	"entrypoints": {
+		"main": [
+			"kimit.rimor.Rimor"
+		],
+		"client": [
+			"kimit.rimor.client.RimorClient"
+		],
+		"fabric-datagen": [
+			"kimit.rimor.client.RimorDataGenerator"
+		],
+		"cardinal-components": [
+			"kimit.rimor.RimorComponents"
+		]
+	},
+	"mixins": [
+		"rimor.mixins.json",
+		{
+			"config": "rimor.client.mixins.json",
+			"environment": "client"
+		}
+	],
+	"depends": {
+		"fabricloader": ">=0.16.9",
+		"minecraft": "~1.21.4",
+		"java": ">=21",
+		"fabric-api": "*"
+	},
+	"suggests": {
+		"another-mod": "*"
+	},
+	"custom": {
+		"cardinal-components": [
+			"rimor:trade"
+		]
+	}
+}
