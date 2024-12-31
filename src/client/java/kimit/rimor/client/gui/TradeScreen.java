@@ -23,11 +23,12 @@ import java.util.Objects;
 public class TradeScreen extends Screen
 {
 	public static final Identifier BACKGROUND_TEXTURE = Rimor.id("trade");
-	public static final int BACKGROUND_WIDTH = 300;
+	public static final int BACKGROUND_WIDTH = 400;
 	public static final int BACKGROUND_HEIGHT = 200;
 	private ScrollableContainer ItemContainer;
 	private ScrollableContainer TradeContainer;
 	private TextFieldWidget SearchWidget;
+	private Identifier SelectedItem = null;
 	
 	public TradeScreen()
 	{
@@ -39,21 +40,20 @@ public class TradeScreen extends Screen
 	{
 		super.init();
 		ItemContainer = new ScrollableContainer(getLeft() + 8, getTop() + 27, 106, 165, getLeft() + 116, getTop() + 27, 165, 16.0f);
-		List<ClickableWidget> trades = new ArrayList<>();
-		if (TradeContainer != null)
-			trades = TradeContainer.getChildren();
-		TradeContainer = new ScrollableContainer(getLeft() + 134, getTop() + 8, 146, 184, getLeft() + 281, getTop() + 8, 184, 16.0f);
-		TradeContainer.addChildren(trades);
+		TradeContainer = new ScrollableContainer(getLeft() + 134, getTop() + 8, 246, 184, getLeft() + 381, getTop() + 8, 184, 16.0f);
 		SearchWidget = new TextFieldWidget(textRenderer, getLeft() + 26, getTop() + 10, 99, 14, Text.empty());
 		search();
+		if (SelectedItem != null)
+			selectItem(SelectedItem);
 	}
 	
 	public void selectItem(Identifier item)
 	{
+		SelectedItem = item;
 		List<ClickableWidget> results = new ArrayList<>();
-		List<TradeEntry> entries = RimorComponents.TRADE.get(Objects.requireNonNull(MinecraftClient.getInstance().getServer()).getScoreboard()).getTrades().get(item);
+		List<TradeEntry> entries = RimorComponents.TRADE.get(Objects.requireNonNull(MinecraftClient.getInstance().player).getScoreboard()).getTrades().get(item);
 		for (int loop = 0; loop < entries.size(); loop++)
-			results.add(new TradeEntryWidget(4, 4 + loop * 25, new ItemStack(Registries.ITEM.get(item)), entries.get(loop)));
+			results.add(new TradeEntryWidget(TradeContainer.getX() + 4, TradeContainer.getY() + 4 + loop * 25, entries.get(loop)));
 		TradeContainer.clearChildren();
 		TradeContainer.addChildren(results);
 	}
@@ -71,14 +71,14 @@ public class TradeScreen extends Screen
 	public void search()
 	{
 		List<ClickableWidget> results = new ArrayList<>();
-		List<Identifier> keys = RimorComponents.TRADE.get(Objects.requireNonNull(MinecraftClient.getInstance().getServer()).getScoreboard()).getTrades().keySet().stream().toList();
+		List<Identifier> keys = RimorComponents.TRADE.get(Objects.requireNonNull(MinecraftClient.getInstance().player).getScoreboard()).getTrades().keySet().stream().toList();
 		int pos = 0;
 		for (Identifier key : keys)
 		{
 			Item item = Registries.ITEM.get(key);
 			if (item.getName().getString().toLowerCase(Locale.ROOT).contains(SearchWidget.getText().toLowerCase(Locale.ROOT)))
 			{
-				results.add(new TradeItemButton(this, 3 + pos % 4 * 25, 3 + pos / 4 * 25, new ItemStack(item)));
+				results.add(new TradeItemButton(this, ItemContainer.getX() + 3 + pos % 4 * 25, ItemContainer.getY() + 3 + pos / 4 * 25, new ItemStack(item)));
 				pos++;
 			}
 		}

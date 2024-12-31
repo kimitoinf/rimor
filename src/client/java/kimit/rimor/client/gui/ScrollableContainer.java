@@ -1,5 +1,6 @@
 package kimit.rimor.client.gui;
 
+import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.Drawable;
 import net.minecraft.client.gui.Element;
@@ -7,6 +8,7 @@ import net.minecraft.client.gui.ScreenRect;
 import net.minecraft.client.gui.widget.ClickableWidget;
 import net.minecraft.client.gui.widget.EmptyWidget;
 import net.minecraft.client.render.RenderLayer;
+import net.minecraft.component.DataComponentTypes;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.math.MathHelper;
 
@@ -44,13 +46,23 @@ public class ScrollableContainer extends EmptyWidget implements Drawable, Elemen
 	{
 		context.enableScissor(getX(), getY(), getX() + getWidth(), getY() + getHeight());
 		context.getMatrices().push();
-		context.getMatrices().translate(getX(), getY() - Scroll, 0);
+		context.getMatrices().translate(0, -Scroll, 0);
 		
 		for (ClickableWidget child : Children)
-			child.render(context, mouseX - getX(), mouseY - getY() + Scroll, delta);
+			child.render(context, mouseX, mouseY + Scroll, delta);
 		
 		context.getMatrices().pop();
 		context.disableScissor();
+		
+		for (ClickableWidget child : Children)
+		{
+			if (child instanceof ClickableWidget)
+			{
+				TooltipWidget tooltip = (TooltipWidget) child;
+				if (tooltip.isMouseTooltipOver(mouseX, mouseY + Scroll) && mouseY >= getY() && mouseY <= getY() + getHeight())
+					context.drawTooltip(MinecraftClient.getInstance().textRenderer, tooltip.getTooltip(tooltip.getStack()), mouseX, mouseY, tooltip.getStack().get(DataComponentTypes.TOOLTIP_STYLE));
+			}
+		}
 		
 		context.drawGuiTexture(RenderLayer::getGuiTextured, SCROLLER_TEXTURE, ScrollerX, ScrollerY + CurrentScroller, SCROLLER_WIDTH, SCROLLER_HEIGHT);
 	}
@@ -59,7 +71,7 @@ public class ScrollableContainer extends EmptyWidget implements Drawable, Elemen
 	public boolean mouseClicked(double mouseX, double mouseY, int button)
 	{
 		for (ClickableWidget child : Children)
-			if (isMouseOver(mouseX, mouseY) && child.mouseClicked(mouseX - getX(), mouseY - getY() + Scroll, button))
+			if (isMouseOver(mouseX, mouseY) && child.mouseClicked(mouseX, mouseY + Scroll, button))
 				return true;
 		return false;
 	}
@@ -117,7 +129,7 @@ public class ScrollableContainer extends EmptyWidget implements Drawable, Elemen
 			if (loop.getY() + loop.getHeight() > maxHeight)
 				maxHeight = loop.getY() + loop.getHeight();
 		}
-		ChildrenHeight = maxHeight + minHeight;
+		ChildrenHeight = maxHeight + minHeight - 2 * getY();
 	}
 	
 	public List<ClickableWidget> getChildren()

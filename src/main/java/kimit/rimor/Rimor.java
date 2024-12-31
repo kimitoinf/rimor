@@ -1,16 +1,17 @@
 package kimit.rimor;
 
-import kimit.rimor.trade.TradeEntry;
 import net.fabricmc.api.ModInitializer;
 
+import net.fabricmc.fabric.api.event.lifecycle.v1.ServerEntityEvents;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerWorldEvents;
+import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.item.ItemStack;
 import net.minecraft.registry.Registries;
 import net.minecraft.util.Identifier;
+import net.minecraft.world.World;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.LinkedList;
-import java.util.List;
 import java.util.UUID;
 
 public class Rimor implements ModInitializer
@@ -26,14 +27,27 @@ public class Rimor implements ModInitializer
 	@Override
 	public void onInitialize()
 	{
+//		ServerEntityEvents.ENTITY_LOAD.register((entity, world) ->
+//		{
+//			if (entity instanceof PlayerEntity)
+//			{
+//				LOGGER.info("Loading Rimor");
+//				var trade = RimorComponents.TRADE.get(world.getScoreboard());
+//				for (int loop = 0; loop < 100; loop++)
+//				{
+//					if (Registries.ITEM.getId(Registries.ITEM.get(loop)).toString().equals("minecraft:air"))
+//						continue;
+//					for (int loop2 = 0; loop2 < 20; loop2++)
+//						trade.addEntry(UUID.randomUUID(), new ItemStack(Registries.ITEM.get(loop), loop2 + 1), loop2 * 500);
+//				}
+//				LOGGER.info(String.valueOf(trade.getTrades().size()));
+//			}
+//		});
+		
 		ServerWorldEvents.LOAD.register((server, world) ->
 		{
-			LOGGER.info("Loading Rimor");
-			var trade = RimorComponents.TRADE.get(server.getScoreboard());
-			for (var loop : Registries.ITEM)
-				trade.getTrades().put(Registries.ITEM.getId(loop), List.of(new TradeEntry(UUID.randomUUID(), 10, 10000), new TradeEntry(UUID.randomUUID(), 100, 20000)));
-			RimorComponents.TRADE.sync(server.getScoreboard());
-			LOGGER.info(String.valueOf(trade.getTrades().size()));
+			if (world.getRegistryKey() == World.OVERWORLD)
+				RimorComponents.TRADE.sync(server.getScoreboard());
 		});
 	}
 }

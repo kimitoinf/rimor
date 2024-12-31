@@ -1,6 +1,7 @@
 package kimit.rimor.trade;
 
 import com.mojang.serialization.Codec;
+import kimit.rimor.Rimor;
 import kimit.rimor.RimorComponents;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NbtCompound;
@@ -15,8 +16,8 @@ import java.util.*;
 
 public class TradeComponent implements AutoSyncedComponent
 {
-	public static final Codec<Map<Identifier, List<TradeEntry>>> TRADES_CODEC = Codec.unboundedMap(Identifier.CODEC, TradeEntry.CODEC.listOf().xmap(LinkedList::new, LinkedList::new)).xmap(HashMap::new, mutable -> new HashMap<>());
-	private static final String TRADES_KEY = "trade";
+	public static final Codec<Map<Identifier, List<TradeEntry>>> TRADES_CODEC = Codec.unboundedMap(Identifier.CODEC, TradeEntry.CODEC.listOf().xmap(LinkedList::new, Collections::unmodifiableList));
+	private static final String TRADES_KEY = "trades";
 	private final Scoreboard Provider;
 	private Map<Identifier, List<TradeEntry>> Trades = new HashMap<>();
 	
@@ -34,8 +35,7 @@ public class TradeComponent implements AutoSyncedComponent
 	@Override
 	public void writeToNbt(NbtCompound nbt, RegistryWrapper.WrapperLookup registries)
 	{
-		TRADES_CODEC.encodeStart(registries.getOps(NbtOps.INSTANCE), Trades).ifSuccess(nbtElement -> nbt.put(TRADES_KEY, nbtElement));
-		nbt.putLong("asdf", 1);
+		TRADES_CODEC.encodeStart(registries.getOps(NbtOps.INSTANCE), Trades).ifSuccess(nbtElement -> nbt.put(TRADES_KEY, nbtElement)).ifError(error -> Rimor.LOGGER.error(error.message()));
 	}
 	
 	public void addEntry(UUID seller, ItemStack stack, int price)
@@ -45,27 +45,13 @@ public class TradeComponent implements AutoSyncedComponent
 		if (entries == null)
 		{
 			LinkedList<TradeEntry> list = new LinkedList<>();
-			list.add(new TradeEntry(seller, stack.getCount(), price));
+			list.add(new TradeEntry(stack, seller, price));
 			Trades.put(item, list);
 		}
 		else
 		{
-			boolean found = false;
-			for (int loop = 0; loop < entries.size(); loop++)
-			{
-				TradeEntry entry = entries.get(loop);
-				if (entry.seller().equals(seller) && entry.price() == price)
-				{
-					entries.set(loop, new TradeEntry(seller, entry.amount() + stack.getCount(), entry.price()));
-					found = true;
-					break;
-				}
-			}
-			if (!found)
-			{
-				entries.add(new TradeEntry(seller, stack.getCount(), price));
-				entries.sort(Comparator.comparingInt(TradeEntry::price));
-			}
+			entries.add(new TradeEntry(stack, seller, price));
+			entries.sort(Comparator.comparingInt(TradeEntry::price));
 		}
 		RimorComponents.TRADE.sync(Provider);
 	}

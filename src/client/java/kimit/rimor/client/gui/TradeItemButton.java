@@ -9,7 +9,7 @@ import net.minecraft.registry.Registries;
 import net.minecraft.text.Text;
 import net.minecraft.util.Identifier;
 
-public class TradeItemButton extends ClickableWidget
+public class TradeItemButton extends ClickableWidget implements TooltipWidget
 {
 	public static final Identifier BACKGROUND_TEXTURE = Identifier.ofVanilla("recipe_book/slot_craftable");
 	public static final int BACKGROUND_WIDTH = 25;
@@ -41,5 +41,17 @@ public class TradeItemButton extends ClickableWidget
 	protected void appendClickableNarrations(NarrationMessageBuilder builder)
 	{
 	
+	}
+	
+	@Override
+	public ItemStack getStack()
+	{
+		return Item;
+	}
+	
+	@Override
+	public boolean isMouseTooltipOver(int mouseX, int mouseY)
+	{
+		return isMouseOver(mouseX, mouseY);
 	}
 }
