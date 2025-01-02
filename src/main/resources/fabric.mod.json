@@ -46,6 +46,7 @@
 	},
 	"custom": {
 		"cardinal-components": [
+			"rimor:player_data",
 			"rimor:trade"
 		]
 	}

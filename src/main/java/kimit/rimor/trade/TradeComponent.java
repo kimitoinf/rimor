@@ -29,13 +29,13 @@ public class TradeComponent implements AutoSyncedComponent
 	@Override
 	public void readFromNbt(NbtCompound nbt, RegistryWrapper.WrapperLookup registries)
 	{
-		Trades = TRADES_CODEC.parse(registries.getOps(NbtOps.INSTANCE), nbt.get(TRADES_KEY)).result().orElse(new HashMap<>());
+		Trades = new HashMap<>(TRADES_CODEC.parse(registries.getOps(NbtOps.INSTANCE), nbt.get(TRADES_KEY)).result().orElse(new HashMap<>()));
 	}
 	
 	@Override
 	public void writeToNbt(NbtCompound nbt, RegistryWrapper.WrapperLookup registries)
 	{
-		TRADES_CODEC.encodeStart(registries.getOps(NbtOps.INSTANCE), Trades).ifSuccess(nbtElement -> nbt.put(TRADES_KEY, nbtElement)).ifError(error -> Rimor.LOGGER.error(error.message()));
+		TRADES_CODEC.encodeStart(registries.getOps(NbtOps.INSTANCE), Trades).ifSuccess(element -> nbt.put(TRADES_KEY, element)).ifError(error -> Rimor.LOGGER.error(error.message()));
 	}
 	
 	public void addEntry(UUID seller, ItemStack stack, int price)

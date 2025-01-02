@@ -6,12 +6,15 @@ import kimit.rimor.trade.TradeEntry;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.screen.Screen;
+import net.minecraft.client.gui.widget.ButtonWidget;
 import net.minecraft.client.gui.widget.ClickableWidget;
 import net.minecraft.client.gui.widget.TextFieldWidget;
+import net.minecraft.client.gui.widget.TextIconButtonWidget;
 import net.minecraft.client.render.RenderLayer;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.registry.Registries;
+import net.minecraft.scoreboard.Scoreboard;
 import net.minecraft.text.Text;
 import net.minecraft.util.Identifier;
 
@@ -24,34 +27,45 @@ public class TradeScreen extends Screen
 {
 	public static final Identifier BACKGROUND_TEXTURE = Rimor.id("trade");
 	public static final int BACKGROUND_WIDTH = 400;
-	public static final int BACKGROUND_HEIGHT = 200;
+	public static final int BACKGROUND_HEIGHT = 220;
+	private final Scoreboard Provider;
 	private ScrollableContainer ItemContainer;
 	private ScrollableContainer TradeContainer;
 	private TextFieldWidget SearchWidget;
+	private TextIconButtonWidget AddButton;
+	private TextIconButtonWidget RefreshButton;
 	private Identifier SelectedItem = null;
+	private int PlayerCash;
 	
 	public TradeScreen()
 	{
 		super(Text.empty());
+		Provider = Objects.requireNonNull(MinecraftClient.getInstance().player).getScoreboard();
 	}
 	
 	@Override
 	protected void init()
 	{
 		super.init();
-		ItemContainer = new ScrollableContainer(getLeft() + 8, getTop() + 27, 106, 165, getLeft() + 116, getTop() + 27, 165, 16.0f);
-		TradeContainer = new ScrollableContainer(getLeft() + 134, getTop() + 8, 246, 184, getLeft() + 381, getTop() + 8, 184, 16.0f);
-		SearchWidget = new TextFieldWidget(textRenderer, getLeft() + 26, getTop() + 10, 99, 14, Text.empty());
+		ItemContainer = new ScrollableContainer(getLeft() + 8, getTop() + 47, 106, 165, getLeft() + 116, getTop() + 47, 165, 16.0f);
+		TradeContainer = new ScrollableContainer(getLeft() + 134, getTop() + 47, 246, 165, getLeft() + 381, getTop() + 47, 165, 16.0f);
+		SearchWidget = new TextFieldWidget(textRenderer, getLeft() + 26, getTop() + 30, 99, 14, Text.empty());
+		AddButton = TextIconButtonWidget.builder(Text.translatable("rimor.trade.add"), press -> {}, false).dimension(50, 18).texture(Rimor.id("trade_add"), 16, 16).build();
+		AddButton.setPosition(getLeft() + 323, getTop() + 6);
+		RefreshButton = TextIconButtonWidget.builder(Text.literal("Refresh"), press -> init(), true).dimension(18, 18).texture(Rimor.id("trade_refresh"), 16, 16).build();
+		RefreshButton.setPosition(getLeft() + 376, getTop() + 6);
 		search();
 		if (SelectedItem != null)
 			selectItem(SelectedItem);
+		assert MinecraftClient.getInstance().player != null;
+		PlayerCash = RimorComponents.PLAYER_DATA.get(Provider).getData().get(MinecraftClient.getInstance().player.getUuid()).getCash();
 	}
 	
 	public void selectItem(Identifier item)
 	{
 		SelectedItem = item;
 		List<ClickableWidget> results = new ArrayList<>();
-		List<TradeEntry> entries = RimorComponents.TRADE.get(Objects.requireNonNull(MinecraftClient.getInstance().player).getScoreboard()).getTrades().get(item);
+		List<TradeEntry> entries = RimorComponents.TRADE.get(Provider).getTrades().get(item);
 		for (int loop = 0; loop < entries.size(); loop++)
 			results.add(new TradeEntryWidget(TradeContainer.getX() + 4, TradeContainer.getY() + 4 + loop * 25, entries.get(loop)));
 		TradeContainer.clearChildren();
@@ -63,6 +77,14 @@ public class TradeScreen extends Screen
 	{
 		super.render(context, mouseX, mouseY, delta);
 		context.drawGuiTexture(RenderLayer::getGuiTextured, BACKGROUND_TEXTURE, getLeft(), getTop(), BACKGROUND_WIDTH, BACKGROUND_HEIGHT);
+		TextRenderHelper.drawTextCenter(context, Text.translatable("rimor.trade.item"), getLeft() + 149, getTop() + 37, 9, 0);
+		TextRenderHelper.drawTextCenter(context, Text.translatable("rimor.trade.seller"), getLeft() + 188, getTop() + 37, 9, 0);
+		TextRenderHelper.drawTextCenter(context, Text.translatable("rimor.trade.amount"), getLeft() + 233, getTop() + 37, 9, 0);
+		TextRenderHelper.drawTextCenter(context, Text.translatable("rimor.trade.price"), getLeft() + 295, getTop() + 37, 9, 0);
+		TextRenderHelper.drawTextCenter(context, Text.translatable("rimor.trade.buy"), getLeft() + 358, getTop() + 37, 9, 0);
+		TextRenderHelper.drawTextLeft(context, String.format("%,d", PlayerCash), getLeft() + 25, getTop() + 15, 9, 0);
+		AddButton.render(context, mouseX, mouseY, delta);
+		RefreshButton.render(context, mouseX, mouseY, delta);
 		ItemContainer.render(context, mouseX, mouseY, delta);
 		TradeContainer.render(context, mouseX, mouseY, delta);
 		SearchWidget.render(context, mouseX, mouseY, delta);
@@ -71,7 +93,7 @@ public class TradeScreen extends Screen
 	public void search()
 	{
 		List<ClickableWidget> results = new ArrayList<>();
-		List<Identifier> keys = RimorComponents.TRADE.get(Objects.requireNonNull(MinecraftClient.getInstance().player).getScoreboard()).getTrades().keySet().stream().toList();
+		List<Identifier> keys = RimorComponents.TRADE.get(Provider).getTrades().keySet().stream().toList();
 		int pos = 0;
 		for (Identifier key : keys)
 		{
@@ -111,7 +133,7 @@ public class TradeScreen extends Screen
 	@Override
 	public boolean mouseClicked(double mouseX, double mouseY, int button)
 	{
-		if (ItemContainer.mouseClicked(mouseX, mouseY, button) || TradeContainer.mouseClicked(mouseX, mouseY, button))
+		if (ItemContainer.mouseClicked(mouseX, mouseY, button) || TradeContainer.mouseClicked(mouseX, mouseY, button) || AddButton.mouseClicked(mouseX, mouseY, button) || RefreshButton.mouseClicked(mouseX, mouseY, button))
 			return true;
 		if (SearchWidget.mouseClicked(mouseX, mouseY, button))
 		{
