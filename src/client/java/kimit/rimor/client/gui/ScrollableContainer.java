@@ -101,15 +101,15 @@ public class ScrollableContainer extends EmptyWidget implements Drawable, Elemen
 	}
 	
 	@Override
-	public void setFocused(boolean focused)
-	{
-		Focused = focused;
-	}
-	
-	@Override
 	public boolean isFocused()
 	{
 		return Focused;
+	}
+	
+	@Override
+	public void setFocused(boolean focused)
+	{
+		Focused = focused;
 	}
 	
 	@Override

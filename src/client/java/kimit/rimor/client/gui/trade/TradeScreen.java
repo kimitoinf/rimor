@@ -1,12 +1,14 @@
-package kimit.rimor.client.gui;
+package kimit.rimor.client.gui.trade;
 
 import kimit.rimor.Rimor;
 import kimit.rimor.RimorComponents;
+import kimit.rimor.client.gui.OverlayContainer;
+import kimit.rimor.client.gui.ScrollableContainer;
+import kimit.rimor.client.gui.TextRenderHelper;
 import kimit.rimor.trade.TradeEntry;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.screen.Screen;
-import net.minecraft.client.gui.widget.ButtonWidget;
 import net.minecraft.client.gui.widget.ClickableWidget;
 import net.minecraft.client.gui.widget.TextFieldWidget;
 import net.minecraft.client.gui.widget.TextIconButtonWidget;
@@ -31,6 +33,7 @@ public class TradeScreen extends Screen
 	private final Scoreboard Provider;
 	private ScrollableContainer ItemContainer;
 	private ScrollableContainer TradeContainer;
+	private OverlayContainer Overlay;
 	private TextFieldWidget SearchWidget;
 	private TextIconButtonWidget AddButton;
 	private TextIconButtonWidget RefreshButton;
@@ -59,6 +62,8 @@ public class TradeScreen extends Screen
 			selectItem(SelectedItem);
 		assert MinecraftClient.getInstance().player != null;
 		PlayerCash = RimorComponents.PLAYER_DATA.get(Provider).getData().get(MinecraftClient.getInstance().player.getUuid()).getCash();
+		if (Overlay != null && Overlay.isOpened())
+			Overlay = null;
 	}
 	
 	public void selectItem(Identifier item)
@@ -67,7 +72,7 @@ public class TradeScreen extends Screen
 		List<ClickableWidget> results = new ArrayList<>();
 		List<TradeEntry> entries = RimorComponents.TRADE.get(Provider).getTrades().get(item);
 		for (int loop = 0; loop < entries.size(); loop++)
-			results.add(new TradeEntryWidget(TradeContainer.getX() + 4, TradeContainer.getY() + 4 + loop * 25, entries.get(loop)));
+			results.add(new TradeEntryWidget(this, TradeContainer.getX() + 4, TradeContainer.getY() + 4 + loop * 25, entries.get(loop)));
 		TradeContainer.clearChildren();
 		TradeContainer.addChildren(results);
 	}
@@ -88,6 +93,8 @@ public class TradeScreen extends Screen
 		ItemContainer.render(context, mouseX, mouseY, delta);
 		TradeContainer.render(context, mouseX, mouseY, delta);
 		SearchWidget.render(context, mouseX, mouseY, delta);
+		if (Overlay != null && Overlay.isOpened())
+			Overlay.render(context, mouseX, mouseY, delta);
 	}
 	
 	public void search()
@@ -111,6 +118,8 @@ public class TradeScreen extends Screen
 	@Override
 	public boolean keyPressed(int keyCode, int scanCode, int modifiers)
 	{
+		if (Overlay != null && Overlay.isOpened())
+			return Overlay.keyPressed(keyCode, scanCode, modifiers);
 		if (SearchWidget.keyPressed(keyCode, scanCode, modifiers))
 		{
 			search();
@@ -122,6 +131,8 @@ public class TradeScreen extends Screen
 	@Override
 	public boolean charTyped(char chr, int modifiers)
 	{
+		if (Overlay != null && Overlay.isOpened())
+			return Overlay.charTyped(chr, modifiers);
 		if (SearchWidget.charTyped(chr, modifiers))
 		{
 			search();
@@ -133,6 +144,8 @@ public class TradeScreen extends Screen
 	@Override
 	public boolean mouseClicked(double mouseX, double mouseY, int button)
 	{
+		if (Overlay != null && Overlay.isOpened())
+			return Overlay.mouseClicked(mouseX, mouseY, button);
 		if (ItemContainer.mouseClicked(mouseX, mouseY, button) || TradeContainer.mouseClicked(mouseX, mouseY, button) || AddButton.mouseClicked(mouseX, mouseY, button) || RefreshButton.mouseClicked(mouseX, mouseY, button))
 			return true;
 		if (SearchWidget.mouseClicked(mouseX, mouseY, button))
@@ -146,9 +159,16 @@ public class TradeScreen extends Screen
 	@Override
 	public boolean mouseScrolled(double mouseX, double mouseY, double horizontalAmount, double verticalAmount)
 	{
+		if (Overlay != null && Overlay.isOpened())
+			return Overlay.mouseScrolled(mouseX, mouseY, horizontalAmount, verticalAmount);
 		if (ItemContainer.mouseScrolled(mouseX, mouseY, horizontalAmount, verticalAmount) || TradeContainer.mouseScrolled(mouseX, mouseY, horizontalAmount, verticalAmount))
 			return true;
 		return super.mouseScrolled(mouseX, mouseY, horizontalAmount, verticalAmount);
+	}
+	
+	public void setOverlay(OverlayContainer overlay)
+	{
+		Overlay = overlay;
 	}
 	
 	private int getLeft()

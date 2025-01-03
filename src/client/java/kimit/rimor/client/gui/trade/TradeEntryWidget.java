@@ -1,7 +1,10 @@
-package kimit.rimor.client.gui;
+package kimit.rimor.client.gui.trade;
 
 import kimit.rimor.Rimor;
 import kimit.rimor.RimorComponents;
+import kimit.rimor.client.gui.OverlayContainer;
+import kimit.rimor.client.gui.TextRenderHelper;
+import kimit.rimor.client.gui.TooltipWidget;
 import kimit.rimor.trade.TradeEntry;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.DrawContext;
@@ -20,14 +23,22 @@ public class TradeEntryWidget extends ClickableWidget implements TooltipWidget
 	public static final Identifier BACKGROUND_TEXTURE = Rimor.id("trade_entry");
 	public static final int BACKGROUND_WIDTH = 240;
 	public static final int BACKGROUND_HEIGHT = 25;
+	private final TradeScreen Parent;
+	private final OverlayContainer Overlay;
 	private final ButtonWidget BuyButton;
 	private final TradeEntry Entry;
 	
-	public TradeEntryWidget(int x, int y, TradeEntry entry)
+	public TradeEntryWidget(TradeScreen parent, int x, int y, TradeEntry entry)
 	{
 		super(x, y, BACKGROUND_WIDTH, BACKGROUND_HEIGHT, Text.empty());
+		Parent = parent;
 		Entry = entry;
-		BuyButton = ButtonWidget.builder(Text.translatable("rimor.trade.buy"), button -> {Rimor.LOGGER.info(String.valueOf(Entry.price()));}).position(getX() + 206, getY() + 3).size(30, 18).build();
+		Overlay = new TradeBuyOverlay(Parent.width, Parent.height, Entry);
+		BuyButton = ButtonWidget.builder(Text.translatable("rimor.trade.buy"), press ->
+		{
+			Parent.setOverlay(Overlay);
+			Overlay.setOpened(true);
+		}).position(getX() + 206, getY() + 3).size(30, 18).build();
 	}
 	
 	@Override
@@ -40,7 +51,7 @@ public class TradeEntryWidget extends ClickableWidget implements TooltipWidget
 	protected void renderWidget(DrawContext context, int mouseX, int mouseY, float delta)
 	{
 		context.drawGuiTexture(RenderLayer::getGuiTextured, BACKGROUND_TEXTURE, getX(), getY(), getWidth(), getHeight());
-		context.drawItem(Entry.stack(), getX() + 4, getY() + 4);
+		context.drawItemWithoutEntity(Entry.stack(), getX() + 4, getY() + 4);
 		TextRenderHelper.drawTextCenterInWidth(context, RimorComponents.PLAYER_DATA.get(Objects.requireNonNull(MinecraftClient.getInstance().player).getScoreboard()).getData().get(Entry.seller()).getUsername(), getX() + 52, getY() + 12, 48, 9, 0);
 		TextRenderHelper.drawTextRightInWidth(context, String.valueOf(Entry.stack().getCount()), getX() + 109, getY() + 12, 28, 9, 0);
 		TextRenderHelper.drawTextRightInWidth(context, String.valueOf(Entry.price()), getX() + 186, getY() + 12, 71, 9, 0);

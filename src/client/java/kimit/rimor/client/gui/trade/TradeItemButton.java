@@ -1,5 +1,6 @@
-package kimit.rimor.client.gui;
+package kimit.rimor.client.gui.trade;
 
+import kimit.rimor.client.gui.TooltipWidget;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.screen.narration.NarrationMessageBuilder;
 import net.minecraft.client.gui.widget.ClickableWidget;
@@ -34,7 +35,7 @@ public class TradeItemButton extends ClickableWidget implements TooltipWidget
 	protected void renderWidget(DrawContext context, int mouseX, int mouseY, float delta)
 	{
 		context.drawGuiTexture(RenderLayer::getGuiTextured, BACKGROUND_TEXTURE, getX(), getY(), getWidth(), getHeight());
-		context.drawItem(Item, getX() + 4, getY() + 4);
+		context.drawItemWithoutEntity(Item, getX() + 4, getY() + 4);
 	}
 	
 	@Override

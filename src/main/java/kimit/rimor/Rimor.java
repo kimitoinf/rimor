@@ -1,20 +1,13 @@
 package kimit.rimor;
 
 import kimit.rimor.player.PlayerData;
-import kimit.rimor.player.PlayerDataComponent;
 import net.fabricmc.api.ModInitializer;
 
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerEntityEvents;
-import net.fabricmc.fabric.api.event.lifecycle.v1.ServerWorldEvents;
-import net.fabricmc.fabric.api.networking.v1.ServerLoginConnectionEvents;
-import net.fabricmc.fabric.api.networking.v1.ServerPlayConnectionEvents;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.registry.Registries;
-import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.util.Identifier;
-import net.minecraft.world.World;
-import org.ladysnake.cca.api.v3.component.ComponentProvider;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

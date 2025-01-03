@@ -1,6 +1,6 @@
 package kimit.rimor.client.registry;
 
-import kimit.rimor.client.gui.TradeScreen;
+import kimit.rimor.client.gui.trade.TradeScreen;
 import net.fabricmc.fabric.api.client.command.v2.ClientCommandManager;
 import net.fabricmc.fabric.api.client.command.v2.ClientCommandRegistrationCallback;
 import net.minecraft.client.MinecraftClient;
