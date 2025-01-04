@@ -8,6 +8,6 @@ public class RimorClient implements ClientModInitializer
 	@Override
 	public void onInitializeClient()
 	{
-		CommandRegistry.Initialize();
+		CommandRegistry.init();
 	}
 }

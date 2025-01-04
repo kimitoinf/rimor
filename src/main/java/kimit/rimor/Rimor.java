@@ -1,6 +1,7 @@
 package kimit.rimor;
 
 import kimit.rimor.player.PlayerData;
+import kimit.rimor.registry.CommandRegistry;
 import net.fabricmc.api.ModInitializer;
 
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerEntityEvents;
@@ -27,16 +28,17 @@ public class Rimor implements ModInitializer
 	@Override
 	public void onInitialize()
 	{
+		CommandRegistry.init();
 		ServerEntityEvents.ENTITY_LOAD.register((entity, world) ->
 		{
 			if (entity instanceof PlayerEntity player)
 			{
 				var trade = RimorComponents.TRADE.get(world.getScoreboard());
-				for (int loop = 0; loop < 100; loop++)
+				for (int loop = 0; loop < 10; loop++)
 				{
 					if (Registries.ITEM.getId(Registries.ITEM.get(loop)).toString().equals("minecraft:air"))
 						continue;
-					for (int loop2 = 0; loop2 < 20; loop2++)
+					for (int loop2 = 0; loop2 < 10; loop2++)
 						trade.addEntry(player.getUuid(), new ItemStack(Registries.ITEM.get(loop), loop2 + 1), loop2 * 500);
 				}
 				

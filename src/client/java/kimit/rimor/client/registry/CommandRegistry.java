@@ -7,7 +7,7 @@ import net.minecraft.client.MinecraftClient;
 
 public class CommandRegistry
 {
-	public static void Initialize()
+	public static void init()
 	{
 		ClientCommandRegistrationCallback.EVENT.register((dispatcher, registryAccess) ->
 		{

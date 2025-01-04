@@ -23,5 +23,6 @@ public class KoreanLangProvider extends FabricLanguageProvider
 		builder.add("rimor.trade.price", "가격");
 		builder.add("rimor.trade.buy", "구매");
 		builder.add("rimor.trade.cancel", "취소");
+		builder.add("rimor.storage", "창고");
 	}
 }

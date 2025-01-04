@@ -44,6 +44,8 @@ public class TradeBuyOverlay extends OverlayContainer
 			{
 				if (!text.isEmpty())
 					AmountWidget.setText(text.substring(0, text.length() - 1));
+				else
+					Amount = 0;
 			}
 		});
 		addChild(AmountWidget);
