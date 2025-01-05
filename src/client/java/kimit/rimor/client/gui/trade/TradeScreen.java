@@ -39,6 +39,7 @@ public class TradeScreen extends Screen
 	private TextIconButtonWidget RefreshButton;
 	private Identifier SelectedItem = null;
 	private int PlayerCash;
+	private String Search = "";
 	
 	public TradeScreen()
 	{
@@ -105,7 +106,7 @@ public class TradeScreen extends Screen
 		for (Identifier key : keys)
 		{
 			Item item = Registries.ITEM.get(key);
-			if (item.getName().getString().toLowerCase(Locale.ROOT).contains(SearchWidget.getText().toLowerCase(Locale.ROOT)))
+			if (item.getName().getString().toLowerCase(Locale.ROOT).contains(Search.toLowerCase(Locale.ROOT)))
 			{
 				results.add(new TradeItemButton(this, ItemContainer.getX() + 3 + pos % 4 * 25, ItemContainer.getY() + 3 + pos / 4 * 25, new ItemStack(item)));
 				pos++;
@@ -122,6 +123,7 @@ public class TradeScreen extends Screen
 			return Overlay.keyPressed(keyCode, scanCode, modifiers);
 		if (SearchWidget.keyPressed(keyCode, scanCode, modifiers))
 		{
+			Search = SearchWidget.getText();
 			search();
 			return true;
 		}
@@ -135,6 +137,7 @@ public class TradeScreen extends Screen
 			return Overlay.charTyped(chr, modifiers);
 		if (SearchWidget.charTyped(chr, modifiers))
 		{
+			Search = SearchWidget.getText();
 			search();
 			return true;
 		}

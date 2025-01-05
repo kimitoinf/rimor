@@ -1,9 +1,13 @@
 {
+  "rimor.info": "확인",
   "rimor.storage": "창고",
   "rimor.trade.add": "추가",
   "rimor.trade.amount": "수량",
   "rimor.trade.buy": "구매",
   "rimor.trade.cancel": "취소",
+  "rimor.trade.complete": "거래가 완료되었습니다.",
+  "rimor.trade.error.cash": "현금이 부족합니다.",
+  "rimor.trade.error.storage": "창고 공간이 부족합니다.",
   "rimor.trade.item": "아이템",
   "rimor.trade.price": "가격",
   "rimor.trade.seller": "판매자"

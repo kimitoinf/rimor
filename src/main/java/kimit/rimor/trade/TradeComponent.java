@@ -61,6 +61,11 @@ public class TradeComponent implements AutoSyncedComponent
 		return Trades;
 	}
 	
+	public void setTrades(Map<Identifier, List<TradeEntry>> trades)
+	{
+		Trades = trades;
+	}
+	
 	@Override
 	public String toString()
 	{

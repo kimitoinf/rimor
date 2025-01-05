@@ -41,4 +41,9 @@ public class PlayerDataComponent implements AutoSyncedComponent
 	{
 		return Data;
 	}
+	
+	public void setData(Map<UUID, PlayerData> data)
+	{
+		Data = data;
+	}
 }

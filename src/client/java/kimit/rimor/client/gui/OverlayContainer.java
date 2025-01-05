@@ -15,14 +15,17 @@ import java.util.List;
 
 public class OverlayContainer extends EmptyWidget implements Drawable, Element
 {
+	protected final int OVERLAY_DEPTH = 1000;
 	private final Identifier BackgroundTexture;
 	private boolean Opened;
 	private boolean Focused;
 	private final List<ClickableWidget> Children;
+	protected final int Depth;
 	
-	public OverlayContainer(int x, int y, int width, int height, Identifier texture)
+	public OverlayContainer(int x, int y, int width, int height, int depth, Identifier texture)
 	{
 		super(x, y, width, height);
+		Depth = depth;
 		BackgroundTexture = texture;
 		Children = new ArrayList<>();
 		Opened = false;
@@ -34,7 +37,7 @@ public class OverlayContainer extends EmptyWidget implements Drawable, Element
 		if (Opened)
 		{
 			context.getMatrices().push();
-			context.getMatrices().translate(0, 0, 1000);
+			context.getMatrices().translate(0, 0, OVERLAY_DEPTH * Depth);
 			context.drawGuiTexture(RenderLayer::getGuiTextured, BackgroundTexture, getX(), getY(), getWidth(), getHeight());
 			for (ClickableWidget child : Children)
 				child.render(context, mouseX, mouseY, delta);

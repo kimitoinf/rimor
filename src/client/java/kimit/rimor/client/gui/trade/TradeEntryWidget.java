@@ -33,7 +33,7 @@ public class TradeEntryWidget extends ClickableWidget implements TooltipWidget
 		super(x, y, BACKGROUND_WIDTH, BACKGROUND_HEIGHT, Text.empty());
 		Parent = parent;
 		Entry = entry;
-		Overlay = new TradeBuyOverlay(Parent.width, Parent.height, Entry);
+		Overlay = new TradeBuyOverlay(Parent, Parent.width, Parent.height, Entry);
 		BuyButton = ButtonWidget.builder(Text.translatable("rimor.trade.buy"), press ->
 		{
 			Parent.setOverlay(Overlay);
