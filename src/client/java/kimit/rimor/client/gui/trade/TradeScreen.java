@@ -5,7 +5,9 @@ import kimit.rimor.RimorComponents;
 import kimit.rimor.client.gui.OverlayContainer;
 import kimit.rimor.client.gui.ScrollableContainer;
 import kimit.rimor.client.gui.TextRenderHelper;
+import kimit.rimor.network.TradeOfferPayload;
 import kimit.rimor.trade.TradeEntry;
+import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.screen.Screen;
@@ -34,8 +36,8 @@ public class TradeScreen extends Screen
 	private ScrollableContainer ItemContainer;
 	private ScrollableContainer TradeContainer;
 	private OverlayContainer Overlay;
-	private TextFieldWidget SearchWidget;
-	private TextIconButtonWidget AddButton;
+	private TextFieldWidget SearchField;
+	private TextIconButtonWidget OfferButton;
 	private TextIconButtonWidget RefreshButton;
 	private Identifier SelectedItem = null;
 	private int PlayerCash;
@@ -53,10 +55,10 @@ public class TradeScreen extends Screen
 		super.init();
 		ItemContainer = new ScrollableContainer(getLeft() + 8, getTop() + 47, 106, 165, getLeft() + 116, getTop() + 47, 165, 16.0f);
 		TradeContainer = new ScrollableContainer(getLeft() + 134, getTop() + 47, 246, 165, getLeft() + 381, getTop() + 47, 165, 16.0f);
-		SearchWidget = new TextFieldWidget(textRenderer, getLeft() + 26, getTop() + 30, 99, 14, Text.empty());
-		AddButton = TextIconButtonWidget.builder(Text.translatable("rimor.trade.add"), press -> {}, false).dimension(50, 18).texture(Rimor.id("trade_add"), 16, 16).build();
-		AddButton.setPosition(getLeft() + 323, getTop() + 6);
-		RefreshButton = TextIconButtonWidget.builder(Text.literal("Refresh"), press -> init(), true).dimension(18, 18).texture(Rimor.id("trade_refresh"), 16, 16).build();
+		SearchField = new TextFieldWidget(textRenderer, getLeft() + 26, getTop() + 30, 99, 14, Text.empty());
+		OfferButton = TextIconButtonWidget.builder(Text.translatable("rimor.trade.offer"), press -> ClientPlayNetworking.send(TradeOfferPayload.INSTANCE), false).dimension(50, 18).texture(Rimor.id("trade_offer_button"), 16, 16).build();
+		OfferButton.setPosition(getLeft() + 323, getTop() + 6);
+		RefreshButton = TextIconButtonWidget.builder(Text.literal("Refresh"), press -> init(), true).dimension(18, 18).texture(Rimor.id("trade_refresh_button"), 16, 16).build();
 		RefreshButton.setPosition(getLeft() + 376, getTop() + 6);
 		search();
 		if (SelectedItem != null)
@@ -89,11 +91,11 @@ public class TradeScreen extends Screen
 		TextRenderHelper.drawTextCenter(context, Text.translatable("rimor.trade.price"), getLeft() + 295, getTop() + 37, 9, 0);
 		TextRenderHelper.drawTextCenter(context, Text.translatable("rimor.trade.buy"), getLeft() + 358, getTop() + 37, 9, 0);
 		TextRenderHelper.drawTextLeft(context, String.format("%,d", PlayerCash), getLeft() + 25, getTop() + 15, 9, 0);
-		AddButton.render(context, mouseX, mouseY, delta);
+		OfferButton.render(context, mouseX, mouseY, delta);
 		RefreshButton.render(context, mouseX, mouseY, delta);
 		ItemContainer.render(context, mouseX, mouseY, delta);
 		TradeContainer.render(context, mouseX, mouseY, delta);
-		SearchWidget.render(context, mouseX, mouseY, delta);
+		SearchField.render(context, mouseX, mouseY, delta);
 		if (Overlay != null && Overlay.isOpened())
 			Overlay.render(context, mouseX, mouseY, delta);
 	}
@@ -121,9 +123,9 @@ public class TradeScreen extends Screen
 	{
 		if (Overlay != null && Overlay.isOpened())
 			return Overlay.keyPressed(keyCode, scanCode, modifiers);
-		if (SearchWidget.keyPressed(keyCode, scanCode, modifiers))
+		if (SearchField.keyPressed(keyCode, scanCode, modifiers))
 		{
-			Search = SearchWidget.getText();
+			Search = SearchField.getText();
 			search();
 			return true;
 		}
@@ -135,9 +137,9 @@ public class TradeScreen extends Screen
 	{
 		if (Overlay != null && Overlay.isOpened())
 			return Overlay.charTyped(chr, modifiers);
-		if (SearchWidget.charTyped(chr, modifiers))
+		if (SearchField.charTyped(chr, modifiers))
 		{
-			Search = SearchWidget.getText();
+			Search = SearchField.getText();
 			search();
 			return true;
 		}
@@ -149,11 +151,11 @@ public class TradeScreen extends Screen
 	{
 		if (Overlay != null && Overlay.isOpened())
 			return Overlay.mouseClicked(mouseX, mouseY, button);
-		if (ItemContainer.mouseClicked(mouseX, mouseY, button) || TradeContainer.mouseClicked(mouseX, mouseY, button) || AddButton.mouseClicked(mouseX, mouseY, button) || RefreshButton.mouseClicked(mouseX, mouseY, button))
+		if (ItemContainer.mouseClicked(mouseX, mouseY, button) || TradeContainer.mouseClicked(mouseX, mouseY, button) || OfferButton.mouseClicked(mouseX, mouseY, button) || RefreshButton.mouseClicked(mouseX, mouseY, button))
 			return true;
-		if (SearchWidget.mouseClicked(mouseX, mouseY, button))
+		if (SearchField.mouseClicked(mouseX, mouseY, button))
 		{
-			SearchWidget.setFocused(true);
+			SearchField.setFocused(true);
 			return true;
 		}
 		return super.mouseClicked(mouseX, mouseY, button);

@@ -3,7 +3,6 @@ package kimit.rimor.client.gui;
 import kimit.rimor.Rimor;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.widget.ButtonWidget;
-import net.minecraft.client.render.RenderLayer;
 import net.minecraft.text.Text;
 import net.minecraft.util.Identifier;
 
@@ -27,7 +26,6 @@ public class InfoOverlay extends OverlayContainer
 		super.render(context, mouseX, mouseY, delta);
 		context.getMatrices().push();
 		context.getMatrices().translate(0, 0, OVERLAY_DEPTH * Depth);
-		context.drawGuiTexture(RenderLayer::getGuiTextured, BACKGROUND_TEXTURE, getX(), getY(), BACKGROUND_WIDTH, BACKGROUND_HEIGHT);
 		TextRenderHelper.drawTextCenterInWidth(context, Message, getX() + 50, getY() + 17, 88, 9, 0);
 		context.getMatrices().pop();
 	}
