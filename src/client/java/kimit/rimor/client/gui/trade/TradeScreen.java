@@ -40,7 +40,7 @@ public class TradeScreen extends Screen
 	private TextIconButtonWidget OfferButton;
 	private TextIconButtonWidget RefreshButton;
 	private Identifier SelectedItem = null;
-	private int PlayerCash;
+	private long PlayerCash;
 	private String Search = "";
 	
 	public TradeScreen()
@@ -74,10 +74,18 @@ public class TradeScreen extends Screen
 		SelectedItem = item;
 		List<ClickableWidget> results = new ArrayList<>();
 		List<TradeEntry> entries = RimorComponents.TRADE.get(Provider).getTrades().get(item);
-		for (int loop = 0; loop < entries.size(); loop++)
-			results.add(new TradeEntryWidget(this, TradeContainer.getX() + 4, TradeContainer.getY() + 4 + loop * 25, entries.get(loop)));
-		TradeContainer.clearChildren();
-		TradeContainer.addChildren(results);
+		if (entries != null)
+		{
+			for (int loop = 0; loop < entries.size(); loop++)
+				results.add(new TradeEntryWidget(this, TradeContainer.getX() + 4, TradeContainer.getY() + 4 + loop * 25, entries.get(loop)));
+			TradeContainer.clearChildren();
+			TradeContainer.addChildren(results);
+		}
+		else
+		{
+			SelectedItem = null;
+			TradeContainer.clearChildren();
+		}
 	}
 	
 	@Override

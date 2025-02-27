@@ -7,11 +7,11 @@ import net.minecraft.util.Uuids;
 
 import java.util.UUID;
 
-public record TradeEntry(ItemStack stack, UUID seller, int price)
+public record TradeEntry(ItemStack stack, UUID seller, long price)
 {
 	public static final Codec<TradeEntry> CODEC = RecordCodecBuilder.create(instance -> instance.group(
 			ItemStack.CODEC.fieldOf("stack").forGetter(TradeEntry::stack),
 			Uuids.CODEC.fieldOf("seller").forGetter(TradeEntry::seller),
-			Codec.INT.fieldOf("price").forGetter(TradeEntry::price)
+			Codec.LONG.fieldOf("price").forGetter(TradeEntry::price)
 	).apply(instance, TradeEntry::new));
 }

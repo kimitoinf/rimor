@@ -38,7 +38,7 @@ public class TradeComponent implements AutoSyncedComponent
 		TRADES_CODEC.encodeStart(registries.getOps(NbtOps.INSTANCE), Trades).ifSuccess(element -> nbt.put(TRADES_KEY, element)).ifError(error -> Rimor.LOGGER.error(error.message()));
 	}
 	
-	public void addEntry(UUID seller, ItemStack stack, int price)
+	public void addEntry(UUID seller, ItemStack stack, long price)
 	{
 		Identifier item = stack.getRegistryEntry().getKey().get().getValue();
 		List<TradeEntry> entries = Trades.get(item);
@@ -51,7 +51,7 @@ public class TradeComponent implements AutoSyncedComponent
 		else
 		{
 			entries.add(new TradeEntry(stack, seller, price));
-			entries.sort(Comparator.comparingInt(TradeEntry::price));
+			entries.sort(Comparator.comparingLong(TradeEntry::price));
 		}
 		RimorComponents.TRADE.sync(Provider);
 	}

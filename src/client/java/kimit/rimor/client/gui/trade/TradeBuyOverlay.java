@@ -12,7 +12,6 @@ import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.font.TextRenderer;
 import net.minecraft.client.gui.DrawContext;
-import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.widget.ButtonWidget;
 import net.minecraft.client.gui.widget.TextFieldWidget;
 import net.minecraft.client.gui.widget.TextWidget;
@@ -49,6 +48,8 @@ public class TradeBuyOverlay extends OverlayContainer
 		AmountWidget = new TextFieldWidget(renderer, getX() + 9, getY() + 46, 36, 13, Text.empty());
 		AmountWidget.setChangedListener(text ->
 		{
+			if (!text.matches("[0-9]*"))
+				AmountWidget.setText(text.replaceAll("[^[0-9]+]", ""));
 			try
 			{
 				int amount = Integer.parseInt(AmountWidget.getText());

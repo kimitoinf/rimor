@@ -11,18 +11,18 @@ public class PlayerData
 {
 	public static final Codec<PlayerData> CODEC = RecordCodecBuilder.create(instance -> instance.group(
 			Codec.STRING.fieldOf("username").forGetter(PlayerData::getUsername),
-			Codec.INT.fieldOf("cash").forGetter(PlayerData::getCash),
-			Codec.INT.fieldOf("storage_row").forGetter(PlayerData::getStorageRow),
+			Codec.LONG.fieldOf("cash").forGetter(PlayerData::getCash),
+			Codec.BYTE.fieldOf("storage_row").forGetter(PlayerData::getStorageRow),
 			Codec.list(ItemStack.CODEC).fieldOf("storage").forGetter(PlayerData::getStorage)
 	).apply(instance, PlayerData::new));
 	public static final int STORAGE_SLOT_PER_LINE = 9;
 	public static final int STORAGE_MAX_LINE = 6;
 	private String Username;
-	private int Cash;
-	private int StorageRow;
+	private long Cash;
+	private byte StorageRow;
 	private List<ItemStack> Storage;
 	
-	public PlayerData(String username, int cash, int storageRow, List<ItemStack> storage)
+	public PlayerData(String username, long cash, byte storageRow, List<ItemStack> storage)
 	{
 		Username = username;
 		Cash = cash;
@@ -56,22 +56,22 @@ public class PlayerData
 		Username = username;
 	}
 	
-	public int getCash()
+	public long getCash()
 	{
 		return Cash;
 	}
 	
-	public void setCash(int cash)
+	public void setCash(long cash)
 	{
 		Cash = cash;
 	}
 	
-	public int getStorageRow()
+	public byte getStorageRow()
 	{
 		return StorageRow;
 	}
 	
-	public void setStorageRow(int row)
+	public void setStorageRow(byte row)
 	{
 		StorageRow = row;
 	}

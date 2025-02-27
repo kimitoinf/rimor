@@ -101,13 +101,16 @@ public class TextRenderHelper
 		float textWidth = renderer.getWidth(text) * scale;
 		context.getMatrices().push();
 		if (textWidth <= width)
+		{
 			context.getMatrices().scale(scale, scale, 1.0f);
+			context.drawText(renderer, text, (int) ((right - renderer.getWidth(text) + 1) / scale), (int) ((centerY - (float) fontHeight / 2 + 1) / scale), color, false);
+		}
 		else
 		{
 			scale = (float) width / renderer.getWidth(text);
 			context.getMatrices().scale(scale, scale, 1.0f);
+			context.drawText(renderer, text, (int) ((right - width + 1) / scale), (int) ((centerY - (float) fontHeight / 2 + 1) / scale), color, false);
 		}
-		context.drawText(renderer, text, (int) ((right - renderer.getWidth(text) + 1) / scale), (int) ((centerY - (float) fontHeight / 2 + 1) / scale), color, false);
 		context.getMatrices().pop();
 	}
 }

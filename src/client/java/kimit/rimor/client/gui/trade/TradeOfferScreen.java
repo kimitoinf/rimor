@@ -31,9 +31,10 @@ public class TradeOfferScreen extends HandledScreen<TradeOfferScreenHandler>
 	public static final int BACKGROUND_WIDTH = 176;
 	public static final int BACKGROUND_HEIGHT = 154;
 	public static final int FEE_RATE = 10;
+	public static final int PRICE_LIMIT = 12;
 	private TextFieldWidget PriceField;
 	private ItemStack Stack;
-	private int Price;
+	private long Price;
 	private OverlayContainer Overlay;
 	
 	public TradeOfferScreen(TradeOfferScreenHandler handler, PlayerInventory inventory, Text title)
@@ -73,11 +74,7 @@ public class TradeOfferScreen extends HandledScreen<TradeOfferScreenHandler>
 				}
 				else
 				{
-					Map<Identifier, List<TradeEntry>> trades = RimorComponents.TRADE.get(scoreboard).getTrades();
-					Identifier key = Registries.ITEM.getId(Stack.getItem());
-					trades.computeIfAbsent(key, k -> new LinkedList<>());
-					trades.get(key).add(new TradeEntry(Stack.copy(), player.getUuid(), Price));
-					trades.get(key).sort(Comparator.comparingInt(TradeEntry::price));
+					RimorComponents.TRADE.get(scoreboard).addEntry(player.getUuid(), Stack.copy(), Price);
 					ClientPlayNetworking.send(new SyncRequestPayload(RimorComponents.PLAYER_DATA.get(scoreboard).getData(), RimorComponents.TRADE.get(scoreboard).getTrades()));
 					data.setCash(data.getCash() - getFee());
 					assert client.interactionManager != null;
@@ -90,16 +87,17 @@ public class TradeOfferScreen extends HandledScreen<TradeOfferScreenHandler>
 		PriceField = new TextFieldWidget(client.textRenderer, x + 97, y + 24, 54, 13, Text.empty());
 		PriceField.setChangedListener(text ->
 		{
+			if (!text.matches("[0-9]*"))
+				PriceField.setText(text.replaceAll("[^[0-9]+]", ""));
+			else if (text.length() == PRICE_LIMIT)
+				PriceField.setText(text.substring(0, PRICE_LIMIT - 1));
 			try
 			{
-				Price = Integer.parseInt(PriceField.getText());
+				Price = Long.parseLong(PriceField.getText());
 			}
 			catch (NumberFormatException e)
 			{
-				if (!text.isEmpty())
-					PriceField.setText(text.substring(0, text.length() - 1));
-				else
-					Price = 0;
+				Price = 0;
 			}
 		});
 		addDrawableChild(offer);
@@ -136,7 +134,7 @@ public class TradeOfferScreen extends HandledScreen<TradeOfferScreenHandler>
 			List<TradeEntry> entries = RimorComponents.TRADE.get(client.player.getScoreboard()).getTrades().get(Registries.ITEM.getId(Stack.getItem()));
 			TextRenderHelper.drawTextRightInWidth(context, entries == null ? "N/A" : String.format("%,d", entries.getFirst().price()), x + 150, y + 15, 54, 9, 0);
 			
-			int total = Stack.getCount() * Price;
+			long total = Stack.getCount() * Price;
 			TextRenderHelper.drawTextRightInWidth(context, String.format("%,d", total), x + 150, y + 47, 54, 9, 0);
 			TextRenderHelper.drawTextRightInWidth(context, String.format("%,d", getFee()), x + 150, y + 59, 54, 9, 0);
 		}
@@ -171,7 +169,7 @@ public class TradeOfferScreen extends HandledScreen<TradeOfferScreenHandler>
 		return super.mouseClicked(mouseX, mouseY, button);
 	}
 	
-	private int getFee()
+	private long getFee()
 	{
 		return Stack.isEmpty() ? 0 : Stack.getCount() * Price * FEE_RATE / 100;
 	}
